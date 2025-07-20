@@ -9,7 +9,7 @@ app = Flask(__name__)
 app.secret_key = 'cinebot-secret-key-2024'
 
 # Configure Google Gemini 2.0 Flash (FREE!)
-GOOGLE_API_KEY = "AIzaSyCHMzFi-b09CUZwbqu9x8oiwpSZw4MvH6c"
+GOOGLE_API_KEY = "gemini api here"
 genai.configure(api_key=GOOGLE_API_KEY)
 
 # Initialize Gemini 2.0 Flash model
