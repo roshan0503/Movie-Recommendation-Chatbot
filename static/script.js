@@ -1,13 +1,10 @@
-// Global variables
+// CineBot Enhanced Script
 let isLoading = false;
 let messageCount = 0;
 
-// Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    // Focus on input
     document.getElementById('message-input').focus();
     
-    // Add enter key listener
     document.getElementById('message-input').addEventListener('keypress', function(e) {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -15,10 +12,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Auto-resize input (optional enhancement)
     const messageInput = document.getElementById('message-input');
     messageInput.addEventListener('input', function() {
-        // Limit character count visual feedback could be added here
         const remaining = 500 - this.value.length;
         if (remaining < 50) {
             this.style.borderColor = remaining < 0 ? '#ef4444' : '#f59e0b';
@@ -28,12 +23,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Send message function
 async function sendMessage() {
     const messageInput = document.getElementById('message-input');
     const message = messageInput.value.trim();
     
-    // Validation
     if (!message || isLoading) {
         return;
     }
@@ -43,18 +36,13 @@ async function sendMessage() {
         return;
     }
     
-    // Clear input and disable
     messageInput.value = '';
     setInputState(false);
     
-    // Add user message to chat
     addMessage(message, 'user');
-    
-    // Show loading
     showLoading();
     
     try {
-        // Send to backend
         const response = await fetch('/chat', {
             method: 'POST',
             headers: {
@@ -64,15 +52,11 @@ async function sendMessage() {
         });
         
         const data = await response.json();
-        
-        // Hide loading
         hideLoading();
         
         if (response.ok && data.status === 'success') {
-            // Add AI response
             addMessage(data.reply, 'ai', data.timestamp);
         } else {
-            // Handle error response
             const errorMsg = data.error || 'Something went wrong. Please try again.';
             addMessage(`❌ ${errorMsg}`, 'ai', null, true);
         }
@@ -82,12 +66,10 @@ async function sendMessage() {
         hideLoading();
         addMessage('❌ Network error. Please check your connection and try again.', 'ai', null, true);
     } finally {
-        // Re-enable input
         setInputState(true);
     }
 }
 
-// Add message to chat
 function addMessage(content, sender, timestamp = null, isError = false) {
     const messagesContainer = document.getElementById('messages-container');
     const messageDiv = document.createElement('div');
@@ -95,9 +77,12 @@ function addMessage(content, sender, timestamp = null, isError = false) {
     messageCount++;
     
     const messageClass = sender === 'user' ? 'user-message' : 'ai-message';
-    const avatarIcon = sender === 'user' ? 'fas fa-user' : 'fas fa-film';
+    const avatarContent = sender === 'user' ? 
+        `<img src="/static/assets/user-avatar.png" alt="User" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+         <div class="fallback-avatar" style="display: none;"><i class="fas fa-user"></i></div>` :
+        `<img src="/static/assets/ai-avatar.png" alt="CineBot" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+         <div class="fallback-avatar" style="display: none;"><i class="fas fa-film"></i></div>`;
     
-    // Format timestamp
     const timeStr = timestamp ? new Date(timestamp).toLocaleTimeString([], { 
         hour: '2-digit', 
         minute: '2-digit' 
@@ -109,9 +94,10 @@ function addMessage(content, sender, timestamp = null, isError = false) {
     messageDiv.className = `message ${messageClass} new`;
     messageDiv.innerHTML = `
         <div class="avatar">
-            <i class="${avatarIcon}"></i>
+            ${avatarContent}
         </div>
         <div class="message-content ${isError ? 'error-message' : ''}">
+            ${sender === 'ai' && !isError ? '<div class="bot-name">CineBot</div>' : ''}
             ${formatMessage(content)}
             <small class="timestamp">${timeStr}</small>
         </div>
@@ -120,21 +106,24 @@ function addMessage(content, sender, timestamp = null, isError = false) {
     messagesContainer.appendChild(messageDiv);
     scrollToBottom();
     
-    // Remove animation class after animation completes
     setTimeout(() => {
         messageDiv.classList.remove('new');
     }, 500);
 }
 
-// Format message content (convert newlines, etc.)
 function formatMessage(content) {
+    // If content already contains HTML (from backend formatting), use it directly
+    if (content.includes('<div') || content.includes('<p>') || content.includes('<strong>')) {
+        return content;
+    }
+    
+    // Otherwise, convert plain text to paragraphs
     return content
         .split('\n')
         .map(line => line.trim() ? `<p>${escapeHtml(line)}</p>` : '')
         .join('');
 }
 
-// Escape HTML to prevent XSS
 function escapeHtml(text) {
     const map = {
         '&': '&amp;',
@@ -146,7 +135,6 @@ function escapeHtml(text) {
     return text.replace(/[&<>"']/g, function(m) { return map[m]; });
 }
 
-// Show loading animation
 function showLoading() {
     const loadingContainer = document.getElementById('loading-container');
     loadingContainer.style.display = 'block';
@@ -154,14 +142,12 @@ function showLoading() {
     scrollToBottom();
 }
 
-// Hide loading animation
 function hideLoading() {
     const loadingContainer = document.getElementById('loading-container');
     loadingContainer.style.display = 'none';
     isLoading = false;
 }
 
-// Set input state (enabled/disabled)
 function setInputState(enabled) {
     const messageInput = document.getElementById('message-input');
     const sendButton = document.getElementById('send-button');
@@ -174,7 +160,6 @@ function setInputState(enabled) {
     }
 }
 
-// Scroll to bottom of messages
 function scrollToBottom() {
     const messagesContainer = document.getElementById('messages-container');
     setTimeout(() => {
@@ -182,7 +167,6 @@ function scrollToBottom() {
     }, 100);
 }
 
-// Clear chat function
 async function clearChat() {
     if (!confirm('Are you sure you want to clear the chat history?')) {
         return;
@@ -197,7 +181,6 @@ async function clearChat() {
         });
         
         if (response.ok) {
-            // Clear messages except welcome message
             const messagesContainer = document.getElementById('messages-container');
             const welcomeMessage = document.getElementById('welcome-message');
             messagesContainer.innerHTML = '';
@@ -212,39 +195,10 @@ async function clearChat() {
     }
 }
 
-// Show error message
 function showError(message) {
     addMessage(`❌ ${message}`, 'ai', null, true);
 }
 
-// Show success message
 function showSuccess(message) {
     addMessage(`✅ ${message}`, 'ai');
 }
-
-// Handle page visibility change (pause/resume animations if needed)
-document.addEventListener('visibilitychange', function() {
-    if (document.hidden) {
-        // Page is hidden, could pause animations
-    } else {
-        // Page is visible, ensure input focus
-        if (!isLoading) {
-            document.getElementById('message-input').focus();
-        }
-    }
-});
-
-// Add some helpful keyboard shortcuts
-document.addEventListener('keydown', function(e) {
-    // Ctrl/Cmd + K to focus input
-    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-        e.preventDefault();
-        document.getElementById('message-input').focus();
-    }
-    
-    // Ctrl/Cmd + L to clear chat
-    if ((e.ctrlKey || e.metaKey) && e.key === 'l') {
-        e.preventDefault();
-        clearChat();
-    }
-});

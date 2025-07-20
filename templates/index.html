@@ -3,21 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎬 Movie Suggestion Chatbot</title>
+    <title>🎬 CineBot - Your Movie Assistant</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="chat-container">
-        <!-- Header -->
+        <!-- CineBot Header -->
         <div class="chat-header">
             <div class="header-content">
                 <div class="ai-avatar">
-                    <i class="fas fa-film"></i>
+                    <img src="{{ url_for('static', filename='assets/ai-avatar.png') }}" alt="CineBot" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="fallback-avatar" style="display: none;">
+                        <i class="fas fa-film"></i>
+                    </div>
                 </div>
                 <div class="header-text">
-                    <h1>🎬 Movie Assistant</h1>
-                    <p>Your friendly AI movie recommender</p>
+                    <h1>🎬 CineBot</h1>
+                    <p>Your Professional Movie Assistant</p>
+                    <span class="status-indicator">● Online</span>
                 </div>
                 <button class="clear-btn" onclick="clearChat()" title="Clear Chat">
                     <i class="fas fa-trash"></i>
@@ -30,11 +34,15 @@
             <!-- Welcome Message -->
             <div class="message ai-message" id="welcome-message">
                 <div class="avatar">
-                    <i class="fas fa-film"></i>
+                    <img src="{{ url_for('static', filename='assets/ai-avatar.png') }}" alt="CineBot" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="fallback-avatar" style="display: none;">
+                        <i class="fas fa-film"></i>
+                    </div>
                 </div>
                 <div class="message-content">
-                    <p>🎬 Hey there! I'm your movie assistant! 🍿</p>
-                    <p>Tell me what you're in the mood for and I'll suggest some great movies! 😊</p>
+                    <div class="bot-name">CineBot</div>
+                    <p>🎬 Hello! I'm CineBot, your professional movie recommendation assistant! 🍿</p>
+                    <p>Tell me what genre, mood, or type of movie you're looking for, and I'll suggest some perfect picks for you!</p>
                     <small class="timestamp">Just now</small>
                 </div>
             </div>
@@ -44,9 +52,13 @@
         <div class="loading-container" id="loading-container" style="display: none;">
             <div class="message ai-message">
                 <div class="avatar">
-                    <i class="fas fa-film"></i>
+                    <img src="{{ url_for('static', filename='assets/ai-avatar.png') }}" alt="CineBot" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="fallback-avatar" style="display: none;">
+                        <i class="fas fa-film"></i>
+                    </div>
                 </div>
                 <div class="message-content">
+                    <div class="bot-name">CineBot</div>
                     <div class="loading-dots">
                         <div class="dot"></div>
                         <div class="dot"></div>
@@ -62,7 +74,7 @@
                 <input 
                     type="text" 
                     id="message-input" 
-                    placeholder="Ask for movie recommendations... 🎭" 
+                    placeholder="Ask CineBot for movie recommendations... 🎭" 
                     maxlength="500"
                     autocomplete="off"
                 >
